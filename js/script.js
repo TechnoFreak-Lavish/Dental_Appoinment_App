@@ -32,5 +32,44 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert("Login Failed: " + error.message);
       }
     });
+
+    const signupForm = document.getElementById("frmsignup");
+    if (signupForm) {
+      signupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("Name").value;
+        const email = document.getElementById("Email").value;
+        const phone = document.getElementById("Phone").value;
+        const password = document.getElementById("Password").value;
+
+        if (!name || !email || !phone || !password) {
+          alert(" Please enter all fields.");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            "http://localhost:5000/api/auth/register",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name, email, phone, password }),
+            }
+          );
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error("Signup Failed: " + errorText);
+          }
+
+          const data = await response.json();
+          alert("Signup Successful!!");
+          window.location.href = "login.html";
+        } catch (error) {
+          console.error("Signup Error:", error);
+          alert("Signup Failed: " + error.message);
+        }
+      });
+    }
   }
 });
