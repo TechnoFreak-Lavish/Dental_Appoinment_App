@@ -236,38 +236,39 @@ document.addEventListener("DOMContentLoaded", async () => {
         slotsContainer.innerHTML = "<p>Error loading slots.</p>";
       });
   }
+  if (confirmBtn) {
+    confirmBtn.addEventListener("click", () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please log in first!");
+        return;
+      }
 
-  confirmBtn.addEventListener("click", () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Please log in first!");
-      return;
-    }
+      if (!selectedDate || !selectedSlot) {
+        alert("Please select a date and a time slot.");
+        return;
+      }
 
-    if (!selectedDate || !selectedSlot) {
-      alert("Please select a date and a time slot.");
-      return;
-    }
+      localStorage.setItem("appointmentDate", selectedDate);
+      localStorage.setItem("appointmentTime", selectedSlot);
 
-    localStorage.setItem("appointmentDate", selectedDate);
-    localStorage.setItem("appointmentTime", selectedSlot);
+      window.location.href = "bookappointment.html";
+    });
 
-    window.location.href = "bookappointment.html";
-  });
+    prevMonthBtn.addEventListener("click", () => {
+      if (monthOffset > 0) {
+        monthOffset -= 1;
+        generateCalendar(monthOffset);
+      }
+    });
 
-  prevMonthBtn.addEventListener("click", () => {
-    if (monthOffset > 0) {
-      monthOffset -= 1;
-      generateCalendar(monthOffset);
-    }
-  });
+    nextMonthBtn.addEventListener("click", () => {
+      if (monthOffset < 2) {
+        monthOffset += 1;
+        generateCalendar(monthOffset);
+      }
+    });
 
-  nextMonthBtn.addEventListener("click", () => {
-    if (monthOffset < 2) {
-      monthOffset += 1;
-      generateCalendar(monthOffset);
-    }
-  });
-
-  generateCalendar(monthOffset);
+    generateCalendar(monthOffset);
+  }
 });

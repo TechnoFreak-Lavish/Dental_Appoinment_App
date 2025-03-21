@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirm Booking</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(to right, #4facfe, #00f2fe);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .card {
+        max-width: 600px;
+        width: 100%;
+        padding: 30px;
+      }
+      .info p {
+        margin-bottom: 10px;
+        font-size: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card shadow-lg">
+      <h2 class="text-center mb-4">Confirm Your Appointment</h2>
+      <div id="bookingDetails" class="info mb-4"></div>
+      <div class="d-flex justify-content-between">
+        <a href="appointment-form.html" class="btn btn-outline-secondary"
+          >Back</a
+        >
+        <button id="confirmBtn" class="btn btn-success">
+          Confirm Appointment
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const bookingDetails = document.getElementById("bookingDetails");
+
+      const name = localStorage.getItem("appointmentName");
+      const email = localStorage.getItem("appointmentEmail");
+      const phone = localStorage.getItem("appointmentPhone");
+      const clinic = localStorage.getItem("appointmentClinic");
+      const date = localStorage.getItem("appointmentDate");
+      const time = localStorage.getItem("appointmentTime");
+      const reason = localStorage.getItem("appointmentReason");
+      const token = localStorage.getItem("token");
+
+      if (!name || !email || !phone || !clinic || !date || !time) {
+        alert(
+          "Some booking information is missing. Please restart the booking process."
+        );
+        window.location.href = "appointments.html";
+      }
+
+      bookingDetails.innerHTML = `
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Phone:</strong> ${phone}</p>
+      <p><strong>Clinic:</strong> ${clinic}</p>
+      <p><strong>Date:</strong> ${date}</p>
+      <p><strong>Time:</strong> ${time}</p>
+      <p><strong>Reason:</strong> ${reason || "N/A"}</p>
+    `;
+
+      document
+        .getElementById("confirmBtn")
+        .addEventListener("click", async () => {
+          if (!token) {
+            alert("Session expired. Please log in again.");
+            return (window.location.href = "login.html");
+          }
+
+          try {
+            const button = document.getElementById("confirmBtn");
+            button.disabled = true;
+            button.textContent = "Booking...";
+
+            const res = await fetch(
+              "http://localhost:5000/api/appointments/book",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  name,
+                  email,
+                  phone,
+                  date,
+                  slot: time,
+                  clinic,
+                  reason: reason || `Appointment at ${clinic}`,
+                }),
+              }
+            );
+
+            const data = await res.json();
+
+            if (res.ok) {
+              localStorage.removeItem("appointmentName");
+              localStorage.removeItem("appointmentEmail");
+              localStorage.removeItem("appointmentPhone");
+              localStorage.removeItem("appointmentClinic");
+              localStorage.removeItem("appointmentDate");
+              localStorage.removeItem("appointmentTime");
+              localStorage.removeItem("appointmentReason");
+
+              window.location.href = "thankyou.html";
+            } else if (res.status === 401) {
+              alert("Session expired. Please log in again.");
+              localStorage.removeItem("token");
+              window.location.href = "login.html";
+            } else {
+              alert("Error: " + data.message);
+              button.disabled = false;
+              button.textContent = "Confirm Appointment";
+            }
+          } catch (error) {
+            console.error("Booking failed:", error);
+            alert("Something went wrong while confirming your appointment.");
+            document.getElementById("confirmBtn").textContent =
+              "Confirm Appointment";
+            document.getElementById("confirmBtn").disabled = false;
+          }
+        });
+    </script>
+  </body>
+</html>
