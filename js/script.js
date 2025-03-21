@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const data = await response.json();
         localStorage.setItem("token", data.token);
         alert("Login Successful!");
-        window.location.href = "dashboard.html";
+        window.location.href = "appointments.html";
       } catch (error) {
         console.error(" Login Error:", error);
         alert("Login Failed: " + error.message);
