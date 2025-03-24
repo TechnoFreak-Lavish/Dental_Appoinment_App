@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert("Login Failed: " + error.message);
       }
     });
+  }
     //signup
     const signupForm = document.getElementById("frmsignup");
     if (signupForm) {
@@ -72,7 +73,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       });
     }
-  }
+  
   //fatch the data for display the appoinment confirmation page
   const appointmentForm = document.getElementById("appointmentForm");
   if (appointmentForm) {
@@ -141,6 +142,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.location.href = "confirmation.html";
     });
   }
+    //message alert
+    function showAlert(message, type = "info") {
+      const alertDiv = document.createElement("div");
+      alertDiv.textContent = message;
+      alertDiv.className = `custom-alert ${type}`; // Add styling
+      document.body.appendChild(alertDiv);
+    
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 3000);
+    }
 
   //dashboard script
   const calendar = document.getElementById("calendar");
@@ -272,3 +284,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     generateCalendar(monthOffset);
   }
 });
+
+
