@@ -72,11 +72,12 @@
           appointmentsList.innerHTML = appointments
             .map((appt) => {
               return `
-                <div class="card p-3 mb-2 shadow-sm">
+                <div class="card p-3 mb-2 shadow-sm" data-id="${appt._id}">
                   <p><strong>Patient:</strong> ${appt.name || "N/A"}</p>
                   <p><strong>Date:</strong> ${appt.date}</p>
                   <p><strong>Time:</strong> ${appt.slot}</p>
                   <p><strong>Reason:</strong> ${appt.reason || "N/A"}</p>
+                  <button class="btn btn-danger" onclick="deleteAppointment('${appt._id}')">Delete</button>
                 </div>
               `;
             })
@@ -85,6 +86,31 @@
           appointmentsList.innerHTML = `<p class="text-center text-danger">${err.message}</p>`;
         }
       });
+      function deleteAppointment(appointmentId){
+        if (confirm("Are you sure you want to delete this appointment?")) {
+          const token = localStorage.getItem("token");
+          fetch(`http://localhost:5000/api/appointments/${appointmentId}`,{
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            }
+          })
+                  .then(response =>{
+                    if (response.ok){
+                      alert("Appointment deleted successfully!");
+                      document.querySelector(`[data-id="${appointmentId}"]`).remove();
+                    } else {
+                      return response.json().then(data => {
+                        throw new Error(data.message || "Failed to delete appointment.");
+                      });
+                    }
+                  })
+                  .catch(error =>{
+                    alert("Error: "+ error.message);
+                  });
+        }
+      }
     </script>
   </body>
 </html>
