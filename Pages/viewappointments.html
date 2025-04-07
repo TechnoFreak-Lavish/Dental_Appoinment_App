@@ -78,15 +78,21 @@
                   <p><strong>Time:</strong> ${appt.slot}</p>
                   <p><strong>Reason:</strong> ${appt.reason || "N/A"}</p>
 
-                  <button 
-  class="btn btn-primary btn-sm rounded-pill edit-btn ms-3 d-flex align-items-center gap-1"
-  data-id="${appt._id}" 
-  title="Edit Appointment">
-  ✏️ <span>Edit</span>
-</button>
+               <div class="d-flex justify-content-end gap-2 mt-3">
+    <button 
+      class="btn btn-outline-primary btn-sm rounded-pill d-flex align-items-center gap-1 edit-btn"
+      data-id="${appt._id}" 
+      title="Edit Appointment">
+      ✏️ <span>Edit</span>
+    </button>
 
-                  <button class="btn btn-danger" onclick="deleteAppointment('${appt._id}')">Delete</button>
-
+    <button 
+      class="btn btn-outline-danger btn-sm rounded-pill d-flex align-items-center gap-1"
+      onclick="deleteAppointment('${appt._id}')"
+      title="Delete Appointment">
+      🗑️ <span>Delete</span>
+    </button>
+  </div>
                 </div>
               `;
             })
