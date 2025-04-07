@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Appointment</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .card {
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      padding: 30px;
+      background: #fff;
+    }
+    h3 {
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="d-flex justify-content-center align-items-center vh-100">
+  <div class="container" style="max-width: 500px;">
+    <div class="card">
+      <h3 class="text-center mb-4">Reschedule Appointment</h3>
+      <form id="editForm">
+        <div class="mb-3">
+          <label for="date" class="form-label">New Date</label>
+          <input type="date" id="date" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="slot" class="form-label">New Time Slot</label>
+          <select id="slot" class="form-select" required>
+            <option value="">Select a time slot</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const appointmentId = urlParams.get("id");
+      const token = localStorage.getItem("token");
+
+      if (!appointmentId || !token) {
+        alert("Unauthorized or invalid appointment");
+        window.location.href = "appointments.html";
+        return;
+      }
+
+      const dateInput = document.getElementById("date");
+      const slotSelect = document.getElementById("slot");
+      const form = document.getElementById("editForm");
+
+      let currentSlot = "";
+
+      // Step 1: Load current appointment details
+      const response = await fetch("http://localhost:5000/api/appointments/my-appointments", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const appointments = await response.json();
+      const appointment = appointments.find(appt => appt._id === appointmentId);
+
+      if (!appointment) {
+        alert("Appointment not found.");
+        window.location.href = "appointments.html";
+        return;
+      }
+
+     // Set date and load slots for that date
+dateInput.value = appointment.date;
+currentSlot = appointment.slot;
+
+// Allow rescheduling only from today onward (but allow current value even if past)
+const today = new Date().toISOString().split('T')[0];
+dateInput.setAttribute('min', today);
+if (appointment.date < today) {
+  dateInput.removeAttribute('min');
+}
+
+await loadSlots(appointment.date, currentSlot);
+
+      // Function to load available slots
+      async function loadSlots(date, preselectSlot = null) {
+        const res = await fetch(`http://localhost:5000/api/appointments/slotsavailable/${date}`);
+        const data = await res.json();
+        slotSelect.innerHTML = `<option value="">Select a time slot</option>`;
+
+        // Include current slot even if it's not in the available list
+        const allSlots = new Set(data.availableSlots);
+        if (preselectSlot && !allSlots.has(preselectSlot)) {
+          data.availableSlots.unshift(preselectSlot);
+        }
+
+        data.availableSlots.forEach(slot => {
+          const opt = document.createElement("option");
+          opt.value = slot;
+          opt.textContent = slot;
+          if (slot === preselectSlot) opt.selected = true;
+          slotSelect.appendChild(opt);
+        });
+      }
+
+      // Step 3: Submit changes
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const date = dateInput.value;
+        const slot = slotSelect.value;
+
+        const res = await fetch(`http://localhost:5000/api/appointments/appointments/${appointmentId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ date, slot }),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          alert("Appointment rescheduled successfully!");
+          window.location.href = "viewappointments.html";
+        } else {
+          alert(data.message || "Failed to update appointment.");
+        }
+      });
+    });
+  </script>
+</body>
+</html>
