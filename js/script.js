@@ -1,39 +1,70 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  //alert
+  function showError(message) {
+    const errorDiv = document.getElementById("formError");
+    if (errorDiv) errorDiv.innerHTML = Array.isArray(message)
+      ? message.map(m => `<div>${m}</div>`).join("")
+      : `<div>${message}</div>`;
+  }
+  
+  function showSuccess(message) {
+    const successDiv = document.getElementById("formSuccess");
+    if (successDiv) successDiv.textContent = message;
+  }
+  
+  function clearMessages() {
+    const errorDiv = document.getElementById("formError");
+    const successDiv = document.getElementById("formSuccess");
+    if (errorDiv) errorDiv.innerHTML = "";
+    if (successDiv) successDiv.innerHTML = "";
+  }
+  
+  
+  
   //login
   const loginForm = document.getElementById("frmlogin");
-  if (loginForm) {
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("lgEmail").value;
-      const password = document.getElementById("lgPassword").value;
 
-      if (!email && !password) {
-        alert("Please enter both email and password.");
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("lgEmail").value.trim();
+    const password = document.getElementById("lgPassword").value.trim();
+    clearMessages();
+    if (!email || !password) {
+      showError("Please enter both email and password.");
+      return;
+    }
+
+    try {
+      const response = await fetch("https://dental-appointment-booking-1.onrender.com/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.errors && Array.isArray(data.errors)) {
+          showError("Login failed:\n" + data.errors.join("\n"));
+        } else {
+          showError("Login failed: " + (data.message || "Unknown error"));
+        }
         return;
       }
 
-      try {
-        const response = await fetch("http://localhost:5000/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        });
+      // Success
+      localStorage.setItem("token", data.token);
+      showSuccess("Login Successful!");
+      window.location.href = "appointments.html";
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error("Login Failed: " + errorText);
-        }
-
-        const data = await response.json();
-        localStorage.setItem("token", data.token);
-        alert("Login Successful!");
-        window.location.href = "appointments.html";
-      } catch (error) {
-        console.error(" Login Error:", error);
-        alert("Login Failed: " + error.message);
-      }
-    });
-  }
+    } catch (error) {
+      console.error("Login Error:", error);
+      showAlert("Something went wrong. Please try again.");
+    }
+  });
+}
     //signup
     const signupForm = document.getElementById("frmsignup");
     if (signupForm) {
@@ -45,7 +76,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const password = document.getElementById("Password").value;
 
         if (!name || !email || !phone || !password) {
-          alert(" Please enter all fields.");
+          showError(" Please enter all fields.");
           return;
         }
 
@@ -65,11 +96,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
 
           const data = await response.json();
-          alert("Signup Successful!!");
+          showSuccess("Signup Successful!!");
           window.location.href = "login.html";
         } catch (error) {
           console.error("Signup Error:", error);
-          alert("Signup Failed: " + error.message);
+          showAlert("Signup Failed: " + error.message);
         }
       });
     }
@@ -252,12 +283,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     confirmBtn.addEventListener("click", () => {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Please log in first!");
+        showError("Please log in first!");
         return;
       }
 
       if (!selectedDate || !selectedSlot) {
-        alert("Please select a date and a time slot.");
+        showError("Please select a date and a time slot.");
         return;
       }
 
@@ -283,6 +314,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     generateCalendar(monthOffset);
   }
+
+  //confirmation
+  
 });
 
 

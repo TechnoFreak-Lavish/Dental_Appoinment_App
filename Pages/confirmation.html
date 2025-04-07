@@ -232,13 +232,13 @@
           const data = await res.json();
 
           if (res.ok) {
-            // ❗Only remove personal info — keep clinic/date/time for thank you page
+            
             localStorage.removeItem("appointmentName");
             localStorage.removeItem("appointmentEmail");
             localStorage.removeItem("appointmentPhone");
             localStorage.removeItem("appointmentReason");
 
-            // ✅ Redirect to thank you
+            //  to thank you
             window.location.href = "thankyou.html";
           } else if (res.status === 401) {
             alert("Session expired. Please log in again.");
