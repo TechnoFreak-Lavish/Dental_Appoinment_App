@@ -84,6 +84,70 @@
           width: 200px;
         }
       }
+      #chatbot {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          width: 300px;
+          background: #ffffff;
+          border-radius: 12px;
+          border: 1px solid #ddd;
+          border-top: none; 
+          padding: 12px;
+          font-family: 'Segoe UI', sans-serif;
+          font-size: 12px; 
+          z-index: 1000;
+      }
+
+      #chat-log {
+          max-height: 240px;
+          overflow-y: auto;
+          font-size: 10px;
+          margin-bottom: 10px;
+          border-radius: 8px;
+          background: #f9f9f9;
+      }
+
+      #chat-log div {
+          margin: 6px 0;
+      }
+
+      #chat-log .user {
+          color: #333;
+      }
+
+      #chat-log .bot {
+          color: #007bff;
+      }
+
+      #chat-input {
+          flex: 1;
+          padding: 8px;
+          border: 1px solid #ccc;
+          border-radius: 6px;
+          outline: none;
+          width: 70%;
+      }
+
+      #chatbot button {
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          padding: 8px 12px;
+          border-radius: 6px;
+          cursor: pointer;
+          width: 25%;
+          transition: background 0.3s;
+      }
+
+      #chatbot button:hover {
+          background-color: #45a049;
+      }
+
+      #chatbot-input-area {
+          display: flex;
+          gap: 6px;
+      }
     </style>
   </head>
   <body>
@@ -99,6 +163,16 @@
           >Sign Up</a
         >
       </div>
+      <div id="chatbot">
+        <div id="chat-log"></div>
+        <div id="chatbot-input-area">
+          <input type="text" id="chat-input" placeholder="How can I help you?" />
+          <button onclick="handleChat()">Send</button> 
+        </div>
+      </div>
+
     </div>
+    <script src="//code.tidio.co/your-widget-id.js" async></script>
+    <script src="../js/script.js"></script>
   </body>
 </html>

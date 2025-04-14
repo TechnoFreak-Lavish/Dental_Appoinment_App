@@ -319,4 +319,61 @@ if (loginForm) {
   
 });
 
+//for chat bot
+function handleChat() {
+  const input = document.getElementById("chat-input").value.trim();
+  const log = document.getElementById("chat-log");
+
+  if (!input) return;
+
+  const userMessage = document.createElement("p");
+  userMessage.textContent = "You: " + input;
+  log.appendChild(userMessage);
+
+  const botMessage = document.createElement("p");
+  botMessage.textContent = "chat: " + getBotResponse(input);
+  botMessage.style.fontWeight = "bold";
+  log.appendChild(botMessage);
+
+  document.getElementById("chat-input").value = "";
+  log.scrollTop = log.scrollHeight;
+}
+
+function getBotResponse(input) {
+  input = input.toLowerCase();
+  if (["appointment", "schedule", "book"].some(word => input.toLowerCase().includes(word))) {
+    return "You can view or book appointments under the Appointments tab.";
+  } else if (input.includes("hello") || input.includes("hi") || input.includes("hey")) {
+    return "Hello! How can I assist you today?";
+  } else if (input.includes("view") || input.includes("reschudel") || input.includes("cancel")) {
+    return "You can view or update your appointment in the appointment section.";
+  } else if (input.includes("contact")) {
+    return "you can call us at +1-800-DENTAL";
+  } else {
+    return "I'm here to help! Try asking about appointments, timings, or your booked assingments.";
+  }
+}
+
+function showBannerMessage(text, type = "success", duration = 4000) {
+  const banner = document.getElementById("banner-message");
+
+  banner.textContent = text;
+  banner.style.display = "block";
+
+  if (type === "success") {
+    banner.style.backgroundColor = "#d4edda";
+    banner.style.color = "#155724";
+    banner.style.border = "1px solid #c3e6cb";
+  } else if (type === "error") {
+    banner.style.backgroundColor = "#f8d7da";
+    banner.style.color = "#721c24";
+    banner.style.border = "1px solid #f5c6cb";
+  }
+
+  // Auto-hide after duration
+  setTimeout(() => {
+    banner.style.display = "none";
+  }, duration);
+}
+
 
